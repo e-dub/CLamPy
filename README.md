@@ -2,7 +2,7 @@
 
 # LamPy 
 
-**classical LAMinate theory for the lightweight design of structures and systems in PYthon**
+**Classical LAMinate theory for the lightweight design of structures and systems in PYthon**
 
 **Klassische Laminattheorie für Leichtbau-Strukturen und -Systeme in Python**
 
@@ -26,7 +26,7 @@ python setup.py install
 ```
 
 ### PIP
-You can also install LamPy via PIP
+You can also install CLamPy via PIP
 ```
 pip install LamPy
 ```
@@ -67,5 +67,5 @@ pip install LamPy
     https://wstein.org/edu/2010/480b/projects/05-lamination_theory/
     
 ## Authors
-E. M. Gioia and E. J. Wehrle
+E. M. Gioia & E. J. Wehrle
 
