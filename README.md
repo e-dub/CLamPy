@@ -1,6 +1,6 @@
 <p align=center><img width="50%" src="figures/LamPy.png"></p>
 
-# LamPy 
+# CLamPy 
 
 **Classical LAMinate theory for the lightweight design of structures and systems in PYthon**
 
@@ -28,7 +28,7 @@ python setup.py install
 ### PIP
 You can also install CLamPy via PIP
 ```
-pip install LamPy
+pip install CLamPy
 ```
 
 ## Assumptions:
