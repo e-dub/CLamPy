@@ -10,9 +10,9 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    id="svg1470"
    version="1.1"
-   viewBox="0 0 210 297"
-   height="297mm"
-   width="210mm"
+   viewBox="0 0 193.14745 78.781647"
+   height="78.781647mm"
+   width="193.14745mm"
    sodipodi:docname="LamPy.svg"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
    inkscape:export-filename="/home/wehrle/opt/pyCLT/figures/LamPy.png"
@@ -32,15 +32,21 @@
      id="namedview454"
      showgrid="true"
      inkscape:zoom="0.41827231"
-     inkscape:cx="-8.8215583"
-     inkscape:cy="828.81646"
+     inkscape:cx="117.39163"
+     inkscape:cy="-9.2164096"
      inkscape:window-x="1600"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg1470">
+     inkscape:current-layer="svg1470"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0">
     <inkscape:grid
        type="xygrid"
-       id="grid3499" />
+       id="grid3499"
+       originx="-10.255127"
+       originy="-210.28325" />
   </sodipodi:namedview>
   <defs
      id="defs1464">
@@ -85,7 +91,8 @@
       <path
          id="path73349"
          d="M 0.79375,1.3229167 0,2.38125 H 0.52916667 V 2.9104167 H 1.0583333 V 2.38125 H 1.5875 Z"
-         style="stroke-width:0.26458332" />
+         style="stroke-width:0.26458332"
+         inkscape:connector-curvature="0" />
     </symbol>
     <symbol
        viewBox="0 0 6 16"
@@ -95,10 +102,11 @@
       <path
          id="path73334"
          d="M 1.0583333,1.8520833 V 1.3229167 H 0.52916667 V 1.8520833 H 0 L 0.79375,2.9104167 1.5875,1.8520833 Z"
-         style="stroke-width:0.26458332" />
+         style="stroke-width:0.26458332"
+         inkscape:connector-curvature="0" />
     </symbol>
     <pattern
-       patternTransform="matrix(0.41718481,0,0,4.5693445,9.7367653,-50.607762)"
+       patternTransform="matrix(0.41718481,0,0,4.5693445,-0.51836143,-58.542859)"
        id="pattern3389"
        xlink:href="#Strips1_2-6"
        inkscape:collect="always" />
@@ -119,7 +127,7 @@
          style="fill:black;stroke:none" />
     </pattern>
     <pattern
-       patternTransform="matrix(0.41718481,0,0,4.5693443,50.778741,-98.622351)"
+       patternTransform="matrix(0.41718481,0,0,4.5693443,37.91631,-96.981842)"
        id="pattern3389-6"
        xlink:href="#Strips1_2-6-8"
        inkscape:collect="always" />
@@ -140,7 +148,7 @@
          style="fill:black;stroke:none" />
     </pattern>
     <pattern
-       patternTransform="matrix(0.41718481,0,0,3.9732639,60.329215,-114.26284)"
+       patternTransform="matrix(0.41718481,0,0,3.9732639,52.394118,-104.00771)"
        id="pattern3389-3"
        xlink:href="#Strips1_2-6-1"
        inkscape:collect="always" />
@@ -161,7 +169,7 @@
          style="fill:black;stroke:none" />
     </pattern>
     <pattern
-       patternTransform="matrix(0.41718481,0,0,4.5693443,70.593353,-50.608973)"
+       patternTransform="matrix(0.41718481,0,0,4.5693443,60.338226,-58.54407)"
        id="pattern3389-2"
        xlink:href="#Strips1_2-6-0"
        inkscape:collect="always" />
@@ -182,7 +190,7 @@
          style="fill:black;stroke:none" />
     </pattern>
     <pattern
-       patternTransform="matrix(0.41718481,0,0,1.0926476,7.4942376,-93.142941)"
+       patternTransform="matrix(0.41718481,0,0,1.0926476,-0.44085952,-82.887814)"
        id="pattern3389-3-9"
        xlink:href="#Strips1_2-6-1-2"
        inkscape:collect="always" />
@@ -203,7 +211,7 @@
          style="fill:black;stroke:none" />
     </pattern>
     <pattern
-       patternTransform="matrix(0.41718481,0,0,3.4567388,38.633382,-123.50425)"
+       patternTransform="matrix(0.41718481,0,0,3.4567388,30.698285,-113.24912)"
        id="pattern3389-3-4"
        xlink:href="#Strips1_2-6-1-9"
        inkscape:collect="always" />
@@ -224,7 +232,7 @@
          style="fill:black;stroke:none" />
     </pattern>
     <pattern
-       patternTransform="matrix(0.41718481,0,0,4.5693441,86.467147,-50.607761)"
+       patternTransform="matrix(0.41718481,0,0,4.5693441,76.21202,-58.542858)"
        id="pattern3389-2-4"
        xlink:href="#Strips1_2-6-0-8"
        inkscape:collect="always" />
@@ -245,7 +253,7 @@
          style="fill:black;stroke:none" />
     </pattern>
     <pattern
-       patternTransform="matrix(0.41718481,0,0,4.5693441,131.36456,-50.607761)"
+       patternTransform="matrix(0.41718481,0,0,4.5693441,121.10943,-58.542858)"
        id="pattern3389-2-4-6"
        xlink:href="#Strips1_2-6-0-8-1"
        inkscape:collect="always" />
@@ -266,7 +274,7 @@
          style="fill:black;stroke:none" />
     </pattern>
     <pattern
-       patternTransform="matrix(0.41718481,0,0,4.5693441,108.87496,-50.60897)"
+       patternTransform="matrix(0.41718481,0,0,4.5693441,98.619833,-58.544067)"
        id="pattern3389-2-4-6-1"
        xlink:href="#Strips1_2-6-0-8-1-5"
        inkscape:collect="always" />
@@ -287,7 +295,7 @@
          style="fill:black;stroke:none" />
     </pattern>
     <pattern
-       patternTransform="matrix(0.41718481,0,0,3.9732637,7.412537,-190.99201)"
+       patternTransform="matrix(0.41718481,0,0,3.9732637,-0.52256012,-180.73688)"
        id="pattern3389-3-90"
        xlink:href="#Strips1_2-6-1-91"
        inkscape:collect="always" />
@@ -323,86 +331,86 @@
   <text
      xml:space="preserve"
      style="font-style:normal;font-weight:normal;font-size:50.79999924px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-     x="147.19237"
-     y="72.340347"
+     x="136.93724"
+     y="64.405251"
      id="text2214"><tspan
        id="tspan2212"
-       x="147.19237"
-       y="72.340347"
+       x="136.93724"
+       y="64.405251"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:50.79999924px;font-family:'TeX Gyre Pagella';-inkscape-font-specification:'TeX Gyre Pagella';stroke-width:0.26458332">py</tspan></text>
   <rect
      style="fill:url(#pattern3389);fill-opacity:1;stroke:#000000;stroke-width:0.12482116;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect3156-2"
      width="8.0192003"
      height="60.855377"
-     x="10.317537"
-     y="8.074995" />
+     x="0.062410582"
+     y="0.13989791" />
   <rect
      style="fill:url(#pattern3389-6);fill-opacity:1;stroke:#000000;stroke-width:0.12482116;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect3156-2-4"
      width="8.0192003"
      height="60.855377"
-     x="51.359482"
-     y="-39.939835"
+     x="38.497051"
+     y="-38.299324"
      transform="rotate(45)" />
   <rect
      style="fill:url(#pattern3389-3);fill-opacity:1;stroke:#000000;stroke-width:0.11639518;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect3156-2-9"
      width="8.0192003"
      height="52.916668"
-     x="60.909992"
-     y="-63.235405"
+     x="52.974895"
+     y="-52.980278"
      transform="rotate(90)" />
   <rect
      style="fill:url(#pattern3389-2);fill-opacity:1;stroke:#000000;stroke-width:0.12482116;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect3156-2-8"
      width="8.0192003"
      height="60.855377"
-     x="71.174118"
-     y="8.0737829" />
+     x="60.918991"
+     y="0.13868579" />
   <rect
      style="fill:url(#pattern3389-3-9);fill-opacity:1;stroke:#000000;stroke-width:0.06103814;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect3156-2-9-6"
      width="8.0192003"
      height="14.552083"
-     x="8.074995"
-     y="-79.110405"
+     x="0.13989791"
+     y="-68.855278"
      transform="rotate(90)" />
   <rect
      style="fill:url(#pattern3389-3-4);fill-opacity:1;stroke:#000000;stroke-width:0.10856616;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect3156-2-9-0"
      width="8.0192003"
      height="46.037487"
-     x="39.214149"
-     y="-79.110405"
+     x="31.279053"
+     y="-68.855278"
      transform="rotate(90)" />
   <rect
      style="fill:url(#pattern3389-2-4);fill-opacity:1;stroke:#000000;stroke-width:0.12482116;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect3156-2-8-1"
      width="8.0192003"
      height="60.855377"
-     x="87.047905"
-     y="8.074995" />
+     x="76.792778"
+     y="0.13989791" />
   <rect
      style="fill:url(#pattern3389-2-4-6);fill-opacity:1;stroke:#000000;stroke-width:0.12482116;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect3156-2-8-1-6"
      width="8.0192003"
      height="60.855377"
-     x="131.94553"
-     y="8.074995" />
+     x="121.6904"
+     y="0.13989791" />
   <rect
      style="fill:url(#pattern3389-2-4-6-1);fill-opacity:1;stroke:#000000;stroke-width:0.12482116;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect3156-2-8-1-6-4"
      width="8.0192003"
      height="60.855377"
-     x="109.45581"
-     y="8.0737848" />
+     x="99.200684"
+     y="0.1386877" />
   <rect
      style="fill:url(#pattern3389-3-90);fill-opacity:1;stroke:#000000;stroke-width:0.11639518;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect3156-2-9-7"
      width="8.0192003"
      height="52.916668"
-     x="7.9932947"
-     y="-139.96472"
+     x="0.058197591"
+     y="-129.70959"
      transform="rotate(90)" />
 </svg>
