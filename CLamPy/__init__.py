@@ -1,1 +1,1 @@
-from LamPy.clt import *
+from CLamPy.clt import *
