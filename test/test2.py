@@ -1,4 +1,4 @@
-import pyCLT
+import CLamPy
 import numpy as np
 
 angles = np.linspace(-90, 90, 101)

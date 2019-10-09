@@ -1,4 +1,4 @@
-from LamPy import laminate
+from CLamPy import laminate
 import numpy as np
 
 plotStackLayup = True
