@@ -1,72 +1,162 @@
 import numpy as np
 import math as mt
 import matplotlib.pyplot as plt
-from tikzplotlib import save as tikz_save
+from matplotlib import cm
 from matplotlib.patches import Rectangle, Polygon, Patch
 import pandas as pd
-from matplotlib import cm
+from tikzplotlib import save as tikz_save
+
 
 np.seterr(divide='ignore', invalid='ignore')
 
 
 class laminate(object):
-    def __init__(self, Interactive=False, PrintAll=True, Plot=True,
-                 nPly=3, thkPly=[1, 1, 1], theta=np.array([-45, -30, 0]),
-                 E1=141000, E2=8500, G12=3750, nu12=0.25, phi=0.6,
-                 EFiber=230000, EMatrix=3500, nu12Fiber=0.2, nu12Matrix=0.33,
-                 symmetric=True, RhoFiber=1.8, RhoMatrix=1.2,  Nx=100, Ny=0,
-                 Nxy=0, Mx=0, My=0, Mxy=0, T1=1950, T2=48, C1=1480, C2=200,
-                 S12=55, S13=55, S23=55, LaminateName=""):
-        self.Interactive = Interactive
-        self.PrintAll = PrintAll
-        self.Plot = Plot
-        self.symmetric = symmetric
-        self.nPly = nPly
-        self.theta = theta
-        self.EFiber = EFiber
-        self.EMatrix = EMatrix
-        self.nu12Fiber = nu12Fiber
-        self.nu12Matrix = nu12Matrix
-        self.E1 = E1
-        self.E2 = E2
-        self.G12 = G12
-        self.nu12 = nu12
-        self.phi = phi         # fiber volume percentage
-        self.thkPly = thkPly
-        self.Nx = Nx
-        self.Ny = Ny
-        self.Nxy = Nxy
-        self.Mx = Mx
-        self.My = My
-        self.Mxy = Mxy
-        self.T1 = T1
-        self.T2 = T2
-        self.C1 = C1
-        self.C2 = C2
-        self.S12 = S12
-        self.S13 = S12
-        self.S23 = S23
-        self.RhoFiber = RhoFiber
-        self.RhoMatrix = RhoMatrix
-        self.LaminateName = LaminateName
-        self.unitAngles = "deg"
+    """
+    A class used to represent a laminate of several plies of fiber-reinforced
+    material
+
+    Attributes
+    ----------
+    says_str : str
+        a formatted string to print out what the animal says
+    name : str
+        the name of the animal
+    sound : str
+        the sound that the animal makes
+    num_legs : int
+        the number of legs the animal has (default 4)
+
+    Methods
+    -------
+    says(sound=None)
+        Prints the animals name and what sound it makes
+
+    Parameters
+    ----------
+    LaminateName : str
+        Name of laminate
+    Plot : bool
+        Turn on plotting functionality
+    nPly : int
+        Number of plys in laminate, each value as float
+    symmetric : bool
+        Declares that laminate is of symmetric plies
+    thkPly : list
+        Thickness of each ply, each value as float
+    theta = list
+        Fiber angle of each play, each value as float
+    E1 : float
+        Young's (elasticity) modulus of ply in fiber direction
+    E2 : float
+        Young's (elasticity) modulus of ply orthogonal to fiber direction
+    G12 : float
+        Shear modulus of ply
+    nu12 : float
+        Poisson's (transverse contration) ratio of ply
+    phi : float
+        Fiber concentration in percent
+    EFiber : float
+        Young's (elasticity) modulus of fiber
+    EMatrix : float
+        Young's (elasticity) modulus of matrix
+    nu12Fiber : float
+        Poisson's (transverse contration) ratio of fiber
+    nu12Matrix : float
+        Poisson's (transverse contration) ratio of matrix
+    rhoFiber : float
+        Density of fiber
+    rhoMatrix : float
+        Density of fiber
+    Nx : float
+        Force in laminate x-axis
+    Ny : float
+        Force in laminate y-axis
+    Nxy : float
+        Shear force in laminate xy-axis
+    Mx : float
+        Moment abou laminate x-axis
+    My : float
+        Moment about laminate y-axis
+    Mxy : float
+        Moment about laminate xy-axis
+    T1 : float
+        Tensile strength in fiber direction
+    T2 : float
+        Tensile strength orthogonal to fiber direction
+    C1 : float
+        Compressive strength in fiber direction
+    C2 : float
+        Compressive strength orthongoal to fiber direction
+    S12  : float
+        Shear strength in ply 12-axis
+    S13 : float
+        Shear strength in ply 13-axis
+    S23 : float
+        Shear strength in ply 23-axis
+    unitAngles : str {"deg", "rad"}
+        Define what unit used for angle measurements
+
+    Todos
+    TODO 1: Check and unify units. Should be so done that any unit system of
+            consitent units is accepted.  This is not the case.  See mass
+            calculation
+    """
+
+    LaminateName = ""
+    Plot = True
+    nPly = 3
+    thkPly = [1, 1, 1]
+    theta = [-45, -30, 0]
+    E1 = 141000
+    E2 = 8500
+    G12 = 3750
+    nu12 = 0.25
+    phi = 0.6
+    EFiber = 230000
+    EMatrix = 3500
+    nu12Fiber = 0.2
+    nu12Matrix = 0.33
+    symmetric = True
+    rhoFiber = 1.8
+    rhoMatrix = 1.2
+    Nx = 100
+    Ny = 0
+    Nxy = 0
+    Mx = 0
+    My = 0
+    Mxy = 0
+    T1 = 1950
+    T2 = 48
+    C1 = 1480
+    C2 = 200
+    S12 = 55
+    S13 = 55
+    S23 = 55
+    unitAngles = "deg"
 
     def calcRuleOfMixtures(self):
+        """
+        Calculates ply properties based on fiber and matrix properties
+        """
         self.E1 = self.EFiber*self.phi+self.EMatrix*(1-self.phi)
         self.E2 = (self.phi/self.EFiber + (1-self.phi)/self.EMatrix)**-1
         self.G12Matrix = self.EMatrix/(2*(1+self.nu12Matrix))
         self.G12Fiber = self.EFiber/(2*(1+self.nu12Fiber))
-        self.G12 = (self.phi/self.G12Fiber +
-                    (1-self.phi)/self.G12Matrix)**-1
-#        self.G12 = self.G12Matrix*self.G12Fiber/((self.G12Matrix*self.phi)+
-#                                                 (1-self.phi)*self.G12Fiber)
+        self.G12 = (self.phi/self.G12Fiber + (1-self.phi)/self.G12Matrix)**-1
+        #self.G12 = self.G12Matrix*self.G12Fiber/((self.G12Matrix*self.phi)+
+        #                                         (1-self.phi)*self.G12Fiber)
         self.nu12 = self.nu12Fiber*self.phi+(1-self.phi)*self.nu12Matrix
 
     def SymmetricLaminate(self):
+        """
+        Mirrors plies for symmetric laminates
+        """
         if self.symmetric:
-            ThkSym = np.concatenate((self.thkPly, np.flip(self.thkPly)),
+            ThkSym = np.concatenate((np.array(self.thkPly),
+                                     np.flip(np.array(self.thkPly))),
                                     axis=None)
-            ThetaSym = np.concatenate((self.theta, np.flip(-self.theta)),
+            ThetaSym = np.concatenate((np.array(self.theta),
+                                       np.flip(-np.array(self.theta))),
                                       axis=None)
             PlySym = 2*self.nPly
             self.thkPly = ThkSym
@@ -74,6 +164,10 @@ class laminate(object):
             self.nPly = PlySym
 
     def calcPlyPositions(self):
+        """
+        Calculates ply heights and positions in laminate z-axis (orthognal to
+        surface)
+        """
         self.thkLam = sum(self.thkPly)
         self.z = [[]]*self.nPly
         self.h = [[]]*self.nPly
@@ -84,14 +178,23 @@ class laminate(object):
                                                      self.z[i][1]])))]
 
     def calcPoisson21(self):
+        """
+        Calculates the Poisson ratio in ply 21-axis
+        """
         self.nu21 = (self.nu12*self.E2)/self.E1
 
     def deg2rad(self):
+        """
+        Sets angle measures to radians
+        """
         if self.unitAngles == "deg":
             self.theta = np.deg2rad(self.theta)
-#            self.unitAngles = "rad"
+            #self.unitAngles = "rad"
 
     def calcABD(self):
+        """
+        Calculates ABD matrix of laminate
+        """
         Q11 = self.E1/(1-(self.E2*self.nu12**2)/self.E1)
         Q22 = self.E2/self.E1*Q11
         Q12 = self.nu12*Q22
@@ -123,12 +226,22 @@ class laminate(object):
                              [self.B, self.D]])
 
     def cleanABD(self):
+        """
+        Removes numerical errors in the ABD matrix, placing small values to
+        zero
+        """
         self.ABD[abs(self.ABD) < 1e-3] = 0.0
 
     def calcInverseABD(self):
+        """
+        Inverts ABD matrix
+        """
         self.ABDInv = np.linalg.inv(self.ABD)
 
     def calcLaminateParameters(self):
+        """
+        Calculate laminate properties from ABD matrix
+        """
         self.ELx = 1/(self.ABDInv[0, 0]*self.thkLam)
         self.ELy = 1/(self.ABDInv[1, 1]*self.thkLam)
         self.GLxy = 1/(self.ABDInv[2, 2]*self.thkLam)
@@ -136,6 +249,9 @@ class laminate(object):
         self.nuLyx = self.ABDInv[0, 1]/self.ABDInv[1, 1]
 
     def calcStrain(self):
+        """
+        Calculate strains in laminate from load
+        """
         loadVec = np.array([[self.Nx, self.Ny, self.Nxy, self.Mx, self.My,
                              self.Mxy]]).T
         self.strainVec = self.ABDInv@loadVec
@@ -161,6 +277,9 @@ class laminate(object):
                                        self.strainLBotVec[i])
 
     def calcStress(self):
+        """
+        Calculate stress components from strains
+        """
         self.stressLTopVec = [[]]*self.nPly
         self.stressLBotVec = [[]]*self.nPly
         self.stressPlyTopVec = [[]]*self.nPly
@@ -172,6 +291,9 @@ class laminate(object):
             self.stressPlyBotVec[i] = self.T[i] @ self.stressLTopVec[i]
 
     def calcMisesStress(self):
+        """
+        Calculate equivalent stress after von Mises from stress components
+        """
         A = np.array([[ 1.0, -0.5, 0.0],
                       [-0.5,  1.0, 0.0],
                       [ 0.0,  0.0, 3.0]])
@@ -184,6 +306,9 @@ class laminate(object):
                                              self.stressLTopVec[i])
 
     def calcFailureTsaiWu(self):
+        """
+        Calculate Tsai-Wu failure criterion from stress components
+        """
         self.FailureTsaiWu = []
         self.ReserveTsaiWu = []
         F11 = 1/(self.T1*self.C1)
@@ -230,14 +355,20 @@ class laminate(object):
                 self.FailureModeTsaiWu[i] = "None"
 
     def calcMass(self):
+        """
+        Calculate laminate mass
+        """
         self.LaminateVolume = (np.sum(self.thkPly)/1000)  # fibers volume in m^3 for one m^2 of laminate
-        self.LaminateMass = self.LaminateVolume*(self.RhoFiber*self.phi +
-                                                 self.RhoMatrix*(1-self.phi))
+        self.LaminateMass = self.LaminateVolume*(self.rhoFiber*self.phi +
+                                                 self.rhoMatrix*(1-self.phi))
         #Laminate mass in tons, referred to one m^2
 
     def plotStackLayup(self, savePng=True, saveSvg=True, saveTex=True,
-                       plotShow=True, fontSize=12,
-                       fontName="Tex Gyre Pagella", ColorMap=0):
+                       plotShow=True, fontSize=12, fontName="Tex Gyre Pagella",
+                       ColorMap=0):
+        """
+        Plot ply stackup of laminate
+        """
         #if fontName == "Palatino":
         #    fontName = "Tex Gyre Pagella"
         colorList = defineColorMap(ColorMap)
@@ -302,7 +433,9 @@ class laminate(object):
 
     def plotPlyStrainStress(self, Show=True, SaveTex=True, SavePng=True,
                             SaveSvg=True, ColorMap=0, Legend=True):
-
+        """
+        Plot stresses and strains of laminate
+        """
         colorList = defineColorMap(ColorMap)
         angle = np.rad2deg(self.theta)
         index = np.linspace(0, self.nPly-1, self.nPly)
@@ -436,6 +569,9 @@ class laminate(object):
 
     def plotPlyStrainStressPly(self, Show=True, SaveTex=True, SavePng=True,
                                SaveSvg=True, ColorMap=0, Legend=True):
+        """
+        Plot strain and stress in ply
+        """
         colorList = defineColorMap(ColorMap)
         angle = np.rad2deg(self.theta)
         index = np.linspace(0, self.nPly-1, self.nPly)
@@ -572,6 +708,9 @@ class laminate(object):
                       DecimalPlaces=4, DecimalSymbol=".",
                       LaminateCooSys=True, PlyCooSys=True,
                       PlyTop=True, PlyBottom=True):
+        """
+        Write table of ply values
+        """
         FileName = "PlyTable"
         TestDataTop = {"ply": np.arange(1, self.nPly+1),
                        "fiber orientation": np.rad2deg(self.theta),
@@ -690,6 +829,9 @@ class laminate(object):
 
 
 def formatNumber(value):
+    """
+    Format numbers so that floats with no decimals are integers
+    """
     if value % 1 == 0:
         value = int(value)
     return(value)
@@ -703,6 +845,9 @@ def plotParameterStudyAngle(angles, TW_Res, VMS, Ep, strain, Show=True,
                             ColorStrainFiber="g", SymbolStrainFiber=".",
                             LineStrainFiber="-", ColorStrainx="g",
                             SymbolStrainx=".", LineStrainx="-", xBuffer=0):
+    """
+    Plot parameter study of ply angles
+    """
     fig, ax1 = plt.subplots(nrows=1, ncols=1, figsize=plotSize)
     plt.grid(Grid)
     ax1.spines['right'].set_visible(False)
@@ -849,7 +994,7 @@ if __name__ == "__main__":
     Laminate1.calcMisesStress()
     Laminate1.calcFailureTsaiWu()
     Laminate1.calcMass()
-    print('Laminate mass for one m^2 [t]')
+    print('Laminate mass for 1000 mm² (1 m²) [t]')
     print(Laminate1.LaminateMass)
     print()
     print("reserve factor after Tsai-Wu:")
