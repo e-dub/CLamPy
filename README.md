@@ -11,7 +11,7 @@
 
 ## Installation
 ### Prerequisites
-Python 3 and you can install the necessary libraries via PIP:
+Python 3 in addition to further packages. These necessary libraries can be installed via PIP:
 ```
 pip install scipy
 pip install numpy
@@ -32,21 +32,24 @@ You can also install CLamPy via PIP
 pip install CLamPy
 ```
 
-## Assumptions:
+## Getting started
+See Python scripts and Jupyter notebook in test.
+
+## Assumptions
 * Kirchhoff kinematic assumptions
   * Normals to the neutral plane remain normal after deformation
   * Normals remain straight after deformation
   * Thickness remains the same after deformation
 * Ideal bonding
   *  No height of bonding between plies
-  * Plies cannot slip relative to eachother, no shear deformation
+  * Plies cannot slip relative to each other, i.e. no shear deformation
   * The strength between plies is infinite
 * Geometry
   * Constant uniform thickness
-  * Thin, i.e. b, w >> 10 x thk
-  * Small displacement u_z << thk and small rotations
+  * Thin laminate, i.e. width and length > 10 times thickness
+  * Small displacements and rotations, i.e. out-of-place displacement << thickness
 
-## Furture plans:
+## Furture work
 - [ ] Add documentation including list of all nomenclature with meaning
 - [ ] Different material parameters for each ply as array
 - [ ] Material library
@@ -56,10 +59,10 @@ pip install CLamPy
 - [ ] Add thermal properties
 - [ ] Add moisture properties
 
-## Main source:
-* Jones (1999) Mechanics of composite materials
+## Main source
+* Jones, R. M. (2014) Mechanics of composite materials. Second Edition, Taylor and Francis, New York.
 
-## Further references:
+## Further references
 * http://kmjespersen.sci-life.com/laminate-theory-example-using-python-notebook/
 * https://github.com/joaopbernhardt/lamipy
 * https://github.com/Eacaen/CLT-material-properties
