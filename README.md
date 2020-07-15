@@ -18,6 +18,7 @@ pip install numpy
 pip install matplotlib
 pip install tikzplotlib
 pip install pandas
+pip install openpyxl
 ```
 
 ### Install
