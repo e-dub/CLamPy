@@ -43,7 +43,7 @@ Laminate1.calcFailureTsaiWu()
 # Plot laminate 1
 Laminate1.plotStackLayup()
 Laminate1.plotPlyStrainStress()
-Laminate1.writeTablePly(LaminateCooSys=False, PlyCooSys=True, PlyTop=True,
+Laminate1.writeTablePly(LaminateCS=False, PlyCS=True, PlyTop=True,
                         PlyBottom=True)
 
 # Initialize lamiante 2 and set parameters
@@ -86,10 +86,11 @@ Laminate2.calcFailureTsaiWu()
 # Plot diagrams and print response tables for laminate 2
 Laminate2.plotStackLayup()
 Laminate2.plotPlyStrainStress()
-Laminate2.writeTablePly(LaminateCooSys=True, PlyCooSys=False, PlyTop=True,
+Laminate2.writeTablePly(LaminateCS=True, PlyCS=False, PlyTop=True,
                         PlyBottom=True)
 
 # Print Tsai-Wu data for laminates 1 and 2
+print()
 print("Laminate 1")
 print("-"*50)
 print("Reserve factor after Tsai-Wu:")

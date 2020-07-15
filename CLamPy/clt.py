@@ -698,7 +698,7 @@ class laminate(object):
 
     def writeTablePly(self, writeTex=True, writeCsv=True, printData=True,
                       DecimalPlaces=4, DecimalSymbol=".",
-                      LaminateCooSys=True, PlyCooSys=True,
+                      LaminateCS=True, PlyCS=True,
                       PlyTop=True, PlyBottom=True):
         """
         Write table of ply values
@@ -751,7 +751,7 @@ class laminate(object):
         PlyDataFrameTop = PlyDataFrameTop.round(DecimalPlaces)
         PlyDataFrameBot = PlyDataFrameBot.round(DecimalPlaces)
         if writeTex:
-            if LaminateCooSys:
+            if LaminateCS:
                 headerTex = ["ply", "fiber orientation $\\theta$ [deg]",
                              "strain x $\\varepsilon_x$ [-]",
                              "stress x $\\sigma_x$ [MPa]",
@@ -790,7 +790,7 @@ class laminate(object):
                         print(self.LaminateName,
                               'Laminate bottom reference system characteristics')
                         print(LaminateDataFrameBot.to_string(index=False))
-            if PlyCooSys:
+            if PlyCS:
                 headerTex = ["ply", "fiber orientation $\\theta$ [deg]",
                              "strain 1 $\\varepsilon_1$ [-]",
                              "stress 1 $\\sigma_1$ [MPa]",
@@ -1014,5 +1014,5 @@ if __name__ == "__main__":
     for ii in range(Laminate1.nPly):
         Ep[ii] = np.array([Laminate1.strainLTopVec[ii][0]])
         strain[ii] = np.array([Laminate1.strainPlyTopVec[ii][0]])
-    Laminate1.writeTablePly(LaminateCooSys=True, PlyCooSys=True,
+    Laminate1.writeTablePly(LaminateCS=True, PlyCS=True,
                             PlyTop=True, PlyBottom=True)
