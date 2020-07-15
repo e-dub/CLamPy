@@ -47,25 +47,25 @@ pip install CLamPy
   * Small displacement u_z << thk and small rotations
 
 ## Furture plans:
-    Add documentation including list of all nomenclature with meaning
-    Different material parameters for each ply as array
-    Material library
-    Plot Young's modulus of each ply
-    Top and Bottom characterisctics in an array for each ply
-    Set warning if material properites have strange values
-    Add thermal properties
-    Add moisture properties
+- [ ] Add documentation including list of all nomenclature with meaning
+- [ ] Different material parameters for each ply as array
+- [ ] Material library
+- [ ] Plot Young's modulus of each ply
+- [ ] Top and Bottom characterisctics in an array for each ply
+- [ ] Set warning if material properites have strange values
+- [ ] Add thermal properties
+- [ ] Add moisture properties
 
 ## Main source:
-    Jones (1999) Mechanics of composite materials
+* Jones (1999) Mechanics of composite materials
 
 ## Further references:
-    http://kmjespersen.sci-life.com/laminate-theory-example-using-python-notebook/
-    https://github.com/joaopbernhardt/lamipy
-    https://github.com/Eacaen/CLT-material-properties
-    https://github.com/kemeen/material_mechanics
-    http://kmjespersen.sci-life.com/laminate-theory-example-using-python-notebook/
-    https://wstein.org/edu/2010/480b/projects/05-lamination_theory/
+* http://kmjespersen.sci-life.com/laminate-theory-example-using-python-notebook/
+* https://github.com/joaopbernhardt/lamipy
+* https://github.com/Eacaen/CLT-material-properties
+* https://github.com/kemeen/material_mechanics
+* http://kmjespersen.sci-life.com/laminate-theory-example-using-python-notebook/
+* https://wstein.org/edu/2010/480b/projects/05-lamination_theory/
     
 ## Authors
 E. M. Gioia & E. J. Wehrle
