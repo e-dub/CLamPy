@@ -1,4 +1,4 @@
-<p align=center><img width="50%" src="figures/CLamPy.png"></p>
+<p align=center><img width="75%" src="figures/CLamPy.png"></p>
 
 # CLamPy 
 
