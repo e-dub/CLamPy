@@ -7,6 +7,7 @@ import pandas as pd
 from tikzplotlib import save as tikz_save
 
 
+# Ignore NumPy errors for divsion by zero
 np.seterr(divide='ignore', invalid='ignore')
 
 
@@ -28,7 +29,8 @@ class laminate(object):
     Plot : bool
         Turn on plotting functionality
     nPly : int
-        Number of plys in laminate, each value as float
+        Number of plys in laminate (half the number if symmetrical laminate),
+        each value as float
     symmetric : bool
         Declares that laminate is of symmetric plies
     thkPly : list
@@ -91,7 +93,6 @@ class laminate(object):
             consitent units is accepted.  This is not the case.  See mass
             calculation
     """
-
     LaminateName = ""
     Plot = True
     nPly = 3
@@ -126,7 +127,7 @@ class laminate(object):
 
     def calcRuleOfMixtures(self):
         """
-        Calculates ply properties based on fiber and matrix properties
+        Calculate ply properties based on fiber and matrix properties.
         """
         self.E1 = self.EFiber*self.phi+self.EMatrix*(1-self.phi)
         self.E2 = (self.phi/self.EFiber + (1-self.phi)/self.EMatrix)**-1
@@ -139,7 +140,7 @@ class laminate(object):
 
     def SymmetricLaminate(self):
         """
-        Mirrors plies for symmetric laminates
+        Mirror plies for symmetric laminates.
         """
         if self.symmetric:
             ThkSym = np.concatenate((np.array(self.thkPly),
@@ -148,14 +149,13 @@ class laminate(object):
             ThetaSym = np.concatenate((np.array(self.theta),
                                        np.flip(-np.array(self.theta))),
                                       axis=None)
-            PlySym = 2*self.nPly
             self.thkPly = ThkSym
             self.theta = ThetaSym
-            self.nPly = PlySym
+            self.nPly *= 2
 
     def calcPlyPositions(self):
         """
-        Calculates ply heights and positions in laminate z-axis (orthognal to
+        Calculate ply heights and positions in laminate z-axis (orthognal to
         surface)
         """
         self.thkLam = sum(self.thkPly)
@@ -169,13 +169,13 @@ class laminate(object):
 
     def calcPoisson21(self):
         """
-        Calculates the Poisson ratio in ply 21-axis
+        Calculate the Poisson ratio in ply 21-axis.
         """
         self.nu21 = (self.nu12*self.E2)/self.E1
 
     def deg2rad(self):
         """
-        Sets angle measures to radians
+        Set angle measures to radians.
         """
         if self.unitAngles == "deg":
             self.theta = np.deg2rad(self.theta)
@@ -183,7 +183,7 @@ class laminate(object):
 
     def calcABD(self):
         """
-        Calculates ABD matrix of laminate
+        Calculate ABD matrix of laminate
         """
         Q11 = self.E1/(1-(self.E2*self.nu12**2)/self.E1)
         Q22 = self.E2/self.E1*Q11
@@ -217,14 +217,14 @@ class laminate(object):
 
     def cleanABD(self):
         """
-        Removes numerical errors in the ABD matrix, placing small values to
+        Remove numerical errors in the ABD matrix, placing small values to
         zero
         """
         self.ABD[abs(self.ABD) < 1e-3] = 0.0
 
     def calcInverseABD(self):
         """
-        Inverts ABD matrix
+        Invert ABD matrix
         """
         self.ABDInv = np.linalg.inv(self.ABD)
 
@@ -308,6 +308,7 @@ class laminate(object):
         F12 = -0.5/np.sqrt(self.T1*self.T2*self.C1*self.C2)
         F33 = 1/(self.S12**2)
         self.FailureModeTsaiWu = [[]]*self.nPly
+        self.FailureTsaiWu = [[]]*self.nPly
         self.ReserveTsaiWu = [[]]*self.nPly
         for i in range(self.nPly):
             Mode = [[]]*3
@@ -328,8 +329,9 @@ class laminate(object):
             a = max(aTop, aBot)
             b = max(bTop, bBot)
             self.ReserveTsaiWu[i] = (-b + (b**2 + 4*a)**(1/2))/(2*a)
+            self.FailureTsaiWu[i] = (2*a)/(-b + (b**2 + 4*a)**(1/2))
             if self.ReserveTsaiWu[i] < 1.0:
-                Modes = ["Fiber", "Matrix", "Shear"]
+                Modes = ["fiber", "matrix", "shear"]
                 Mode[0] = max(abs(F1*self.stressPlyTopVec[i][0] +
                                   F11*self.stressPlyTopVec[i][0]**2),
                               abs(F1*self.stressPlyBotVec[i][0] +
@@ -342,7 +344,7 @@ class laminate(object):
                               abs(F33*self.stressPlyBotVec[i][2]**2))
                 self.FailureModeTsaiWu[i] = Modes[np.argmax(Mode)]
             else:
-                self.FailureModeTsaiWu[i] = "None"
+                self.FailureModeTsaiWu[i] = "none"
 
     def calcMass(self):
         """
@@ -438,13 +440,13 @@ class laminate(object):
         legendElements = []
         angleList = []
         angleOrder = np.argsort(angle)
-        for i in range(len(angle)):
+        for i in range(self.nPly):
             j = angleOrder[i]
             val = abs(self.theta[j])
             if val not in angleList:
                 angleList.append(val)
                 lab = (str(round(formatNumber(round(abs(angle[j]), 4)), 2)) +
-                       " [deg]")
+                       " deg")
                 legendElements.append(Patch(facecolor=colorList[int(colorIndex[j])],
                                             edgecolor=colorList[int(colorIndex[j])],
                                             label=lab))
@@ -513,7 +515,7 @@ class laminate(object):
                                          alpha=0.85,
                                          color=colorList[int(colorIndex[i])],
                                          zorder=i))
-        plt.ylabel("laminate height [mm]")
+        plt.ylabel("laminate position $z$ [mm]")
         ax.set_ylim([np.min(self.z), np.max(self.z)])
         #plt.xticks(xShift, ('0\n strain x', '0\n stress x', '0\n strain y', '0\n stress y',
         #                    '0\nstrain xy', '0\n stress xy'))
@@ -523,7 +525,7 @@ class laminate(object):
         ax.xaxis.set_label_position("bottom")
         ax.set_xticks(xShift)
         ax.set_xticklabels(('0', '0', '0', '0', '0', '0'))
-        plt.xlabel("values normalized based on maximum")
+        plt.xlabel("values normalized based on maximum [-]")
         ax2 = ax.twiny()
         ax2.xaxis.set_tick_params(labeltop='on')
         #ax2.xaxis.set_ticks_position("top")
@@ -574,13 +576,13 @@ class laminate(object):
         legendElements = []
         angleList = []
         angleOrder = np.argsort(angle)
-        for i in range(len(angle)):
+        for i in range(self.nPly):
             j = angleOrder[i]
             val = abs(self.theta[j])
             if val not in angleList:
                 angleList.append(val)
                 lab = (str(round(formatNumber(round(abs(angle[j]), 4)), 2)) +
-                       " [deg]")
+                       " deg")
                 legendElements.append(Patch(facecolor=colorList[int(colorIndex[j])],
                                             edgecolor=colorList[int(colorIndex[j])],
                                             label=lab))
@@ -649,7 +651,7 @@ class laminate(object):
                                          alpha=0.85,
                                          color=colorList[int(colorIndex[i])],
                                          zorder=i))
-        plt.ylabel("laminate height [mm]")
+        plt.ylabel("laminate position $z$ [mm]")
         ax.set_ylim([np.min(self.z), np.max(self.z)])
         #plt.xticks(xShift, ('0\n strain x', '0\n stress x', '0\n strain y', '0\n stress y',
         #                    '0\nstrain xy', '0\n stress xy'))
@@ -659,7 +661,7 @@ class laminate(object):
         ax.xaxis.set_label_position("bottom")
         ax.set_xticks(xShift)
         ax.set_xticklabels(('0', '0', '0', '0', '0', '0'))
-        plt.xlabel("values normalized based on maximum")
+        plt.xlabel("values normalized based on maximum [-]")
         ax2 = ax.twiny()
         ax2.xaxis.set_tick_params(labeltop='on')
         #ax2.xaxis.set_ticks_position("top")
@@ -716,6 +718,7 @@ class laminate(object):
                        "stress 2": [i[1][0] for i in self.stressPlyTopVec],
                        "strain 12": [i[2][0] for i in self.strainPlyTopVec],
                        "stress 12": [i[2][0] for i in self.stressPlyTopVec],
+                       "Tsai-Wu failure": self.FailureTsaiWu,
                        "Tsai-Wu reserve": self.ReserveTsaiWu}
         TestDataBot = {"ply": np.arange(1, self.nPly+1),
                        "fiber orientation": np.rad2deg(self.theta),
@@ -731,13 +734,14 @@ class laminate(object):
                        "stress 2": [i[1][0] for i in self.stressPlyBotVec],
                        "strain 12": [i[2][0] for i in self.strainPlyBotVec],
                        "stress 12": [i[2][0] for i in self.stressPlyBotVec],
+                       "Tsai-Wu failure": self.FailureTsaiWu,
                        "Tsai-Wu reserve": self.ReserveTsaiWu}
         ColumnLam = ["ply", "fiber orientation", "strain x", "stress x",
                      "strain y",  "stress y", "strain xy",  "stress xy",
-                     "Tsai-Wu reserve"]
+                     "Tsai-Wu failure", "Tsai-Wu reserve"]
         ColumnPly = ["ply", "fiber orientation", "strain 1", "stress 1",
                      "strain 2", "stress 2", "strain 12", "stress 12",
-                     "Tsai-Wu reserve"]
+                     "Tsai-Wu failure", "Tsai-Wu reserve"]
         LaminateDataFrameTop = pd.DataFrame(TestDataTop, columns=ColumnLam)
         LaminateDataFrameBot = pd.DataFrame(TestDataBot, columns=ColumnLam)
         PlyDataFrameTop = pd.DataFrame(TestDataTop, columns=ColumnPly)
@@ -755,6 +759,7 @@ class laminate(object):
                              "stress y $\\sigma_y$ [MPa]",
                              "strain xy $\\varepsilon_{xy}$ [-]",
                              "stress xy $\\sigma_{xy}$ [MPa]",
+                             "Tsai-Wu failure $F_\\mathrm{TW}$ [-]",
                              "Tsai-Wu reserve $R_\\mathrm{TW}$ [-]"]
                 if PlyTop:
                     LaminateDataFrameTop.to_latex(FileName+"LaminateTop.tex",
@@ -793,6 +798,7 @@ class laminate(object):
                              "stress 2 $\\sigma_2$ [MPa]",
                              "strain 12 $\\varepsilon_{12}$ [-]",
                              "stress 12 $\\sigma_{12}$ [MPa]",
+                             "Tsai-Wu failure $F_\\mathrm{TW}$ [-]",
                              "Tsai-Wu reserve $R_\\mathrm{TW}$ [-]"]
                 if PlyTop:
                     PlyDataFrameTop.to_latex(FileName+"PlyTop.tex", index=None,
@@ -857,8 +863,9 @@ def plotParameterStudyAngle(angles, TW_Res, VMS, Ep, strain, Show=True,
     plt.xlabel("fiber orientation angle $\\theta$ [deg]")
     if SaveTex:
         tikz_save(Name+'_TsaiWuReserve.tex', show_info=False, strict=False,
-                  figureheight='\\figureheight', figurewidth='\\figurewidth',
-                  extra_axis_parameters={"axis lines*=left"})
+                  extra_axis_parameters={"axis lines*=left",
+                                         'height=\\figureheight',
+                                         'width=\\figurewidth'})
     if SavePng:
         plt.savefig(Name+"_TsaiWuReserve.png", format="png")
     if SaveSvg:
@@ -882,8 +889,9 @@ def plotParameterStudyAngle(angles, TW_Res, VMS, Ep, strain, Show=True,
     plt.tight_layout()
     if SaveTex:
         tikz_save(Name+'_StressEqv.tex', show_info=False, strict=False,
-                  figureheight='\\figureheight', figurewidth='\\figurewidth',
-                  extra_axis_parameters={"axis lines*=left"})
+                  extra_axis_parameters={"axis lines*=left",
+                                         'height=\\figureheight',
+                                         'width=\\figurewidth'})
     if SavePng:
         plt.savefig(Name+"_StressMises.png", format="png")
     if SaveSvg:
@@ -897,7 +905,7 @@ def plotParameterStudyAngle(angles, TW_Res, VMS, Ep, strain, Show=True,
     ax3.yaxis.set_ticks_position('left')
     ax3.xaxis.set_ticks_position('bottom')
     plt.plot(angles, Ep, ColorStrainx+SymbolStrainx+LineStrainx)
-    plt.ylabel('strain in $x$ [-]')
+    plt.ylabel('strain in $x$ $\\varepsilon_x$ [-]')
     plt.xlim([min(angles)-xBuffer, max(angles)+xBuffer])
     plt.ylim([min(Ep)-max(np.abs(Ep))*buffer,
               max(Ep)+max(np.abs(Ep))*buffer])
@@ -907,8 +915,9 @@ def plotParameterStudyAngle(angles, TW_Res, VMS, Ep, strain, Show=True,
     plt.tight_layout()
     if SaveTex:
         tikz_save(Name+'_Strain_x.tex', show_info=False, strict=False,
-                  figureheight='\\figureheight', figurewidth='\\figurewidth',
-                  extra_axis_parameters={"axis lines*=left"})
+                  extra_axis_parameters={"axis lines*=left",
+                                         'height=\\figureheight',
+                                         'width=\\figurewidth'})
     if SavePng:
         plt.savefig(Name+"_Strain_x.png", format="png")
     if SaveSvg:
@@ -923,7 +932,7 @@ def plotParameterStudyAngle(angles, TW_Res, VMS, Ep, strain, Show=True,
     ax4.xaxis.set_ticks_position('bottom')
     plt.plot(angles, strain,
              ColorStrainFiber+SymbolStrainFiber+LineStrainFiber)
-    plt.ylabel('strain in $\\parallel$ [-]')
+    plt.ylabel('strain in $\\parallel$ $\\varepsilon_{\\parallel}$ [-]')
     plt.xlim([min(angles)-xBuffer, max(angles)+xBuffer])
     plt.ylim([min(strain)-max(np.abs(strain))*buffer,
               max(strain)+max(np.abs(strain))*buffer])
@@ -933,8 +942,9 @@ def plotParameterStudyAngle(angles, TW_Res, VMS, Ep, strain, Show=True,
     plt.tight_layout()
     if SaveTex:
         tikz_save(Name+'_StrainFiber.tex', show_info=False, strict=False,
-                  figureheight='\\figureheight', figurewidth='\\figurewidth',
-                  extra_axis_parameters={"axis lines*=left"})
+                  extra_axis_parameters={"axis lines*=left",
+                                         'height=\\figureheight',
+                                         'width=\\figurewidth'})
     if SavePng:
         plt.savefig(Name+"_StrainFiber.png", format="png")
     if SaveSvg:
@@ -989,10 +999,10 @@ if __name__ == "__main__":
     print()
     print("reserve factor after Tsai-Wu:")
     for i in range(Laminate1.nPly):
-        print(Laminate1.ReserveTsaiWu[i])
+        print("  Ply "+str(i)+": "+str(round(Laminate1.ReserveTsaiWu[i], 4)))
     print("failure mode after Tsai-Wu:")
     for i in range(Laminate1.nPly):
-        print(Laminate1.FailureModeTsaiWu[i])
+        print("  Ply "+str(i)+": "+Laminate1.FailureModeTsaiWu[i])
     Laminate1.plotStackLayup()
     Laminate1.plotPlyStrainStress()
     Laminate1.plotPlyStrainStressPly()
@@ -1004,6 +1014,5 @@ if __name__ == "__main__":
     for ii in range(Laminate1.nPly):
         Ep[ii] = np.array([Laminate1.strainLTopVec[ii][0]])
         strain[ii] = np.array([Laminate1.strainPlyTopVec[ii][0]])
-#    plotParameterStudyAngle(angles, TW_Res, VMS, Ep, strain)
     Laminate1.writeTablePly(LaminateCooSys=True, PlyCooSys=True,
                             PlyTop=True, PlyBottom=True)
