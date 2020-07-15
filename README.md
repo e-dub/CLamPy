@@ -33,18 +33,18 @@ pip install CLamPy
 ```
 
 ## Assumptions:
-    Kirchhoff kinematic assumptions
-        Normals to the neutral plane remain normal after deformation
-        Normals remain straight after deformation
-        Thickness remains the same after deformation
-    Ideal bonding
-        No height of bonding between plies
-        Plies cannot slip relative to eachother, no shear deformation
-        The strength between plies is infinite
-    Geometry
-        Constant uniform thickness
-        Thin, i.e. b, w >> 10 x thk
-        Small displacement u_z << thk and small rotations
+* Kirchhoff kinematic assumptions
+  * Normals to the neutral plane remain normal after deformation
+  * Normals remain straight after deformation
+  * Thickness remains the same after deformation
+* Ideal bonding
+  *  No height of bonding between plies
+  * Plies cannot slip relative to eachother, no shear deformation
+  * The strength between plies is infinite
+* Geometry
+  * Constant uniform thickness
+  * Thin, i.e. b, w >> 10 x thk
+  * Small displacement u_z << thk and small rotations
 
 ## Furture plans:
     Add documentation including list of all nomenclature with meaning
