@@ -13,16 +13,13 @@ np.seterr(divide='ignore', invalid='ignore')
 
 class laminate(object):
     """
-    A class used to represent a laminate of several plies of fiber-reinforced
-    material
-
-    Attributes
-    ----------
+    A class used to represent a laminate of of fiber-reinforced material.
 
     Methods
     -------
 
-    Parameters
+
+    Attributes
     ----------
     LaminateName : str
         Name of laminate
@@ -93,6 +90,7 @@ class laminate(object):
             consitent units is accepted.  This is not the case.  See mass
             calculation
     """
+
     LaminateName = ""
     Plot = True
     nPly = 3
@@ -128,6 +126,27 @@ class laminate(object):
     def calcRuleOfMixtures(self):
         """
         Calculate ply properties based on fiber and matrix properties.
+
+        Parameters
+        ----------
+        EFiber : float
+            Young's (elasticity) modulus of fiber
+        EMatrix : float
+            Young's (elasticity) modulus of matrix (assumed to be isotropic)
+        E2 : float
+            Young's (elasticity) modulus of ply orthogonal to fiber direction
+        E1 : float
+            Young's (elasticity) modulus of ply in fiber direction
+        E2 : float
+            Young's (elasticity) modulus of ply orthogonal to fiber direction
+        G12Fiber : float
+            Shear modulus of fiber
+        G12Matrix : float
+            Shear modulus of matrix
+        G12 : float
+            Shear modulus of ply
+        nu12 : float
+            Poisson's (transverse contration) ratio of ply
         """
         self.E1 = self.EFiber*self.phi+self.EMatrix*(1-self.phi)
         self.E2 = (self.phi/self.EFiber + (1-self.phi)/self.EMatrix)**-1
@@ -143,20 +162,26 @@ class laminate(object):
         Mirror plies for symmetric laminates.
         """
         if self.symmetric:
-            ThkSym = np.concatenate((np.array(self.thkPly),
-                                     np.flip(np.array(self.thkPly))),
-                                    axis=None)
-            ThetaSym = np.concatenate((np.array(self.theta),
-                                       np.flip(-np.array(self.theta))),
-                                      axis=None)
-            self.thkPly = ThkSym
-            self.theta = ThetaSym
+            self.thkPly = np.concatenate((np.array(self.thkPly),
+                                          np.flip(np.array(self.thkPly))),
+                                         axis=None)
+            self.theta = np.concatenate((np.array(self.theta),
+                                         np.flip(-np.array(self.theta))),
+                                        axis=None)
             self.nPly *= 2
 
     def calcPlyPositions(self):
         """
-        Calculate ply heights and positions in laminate z-axis (orthognal to
-        surface)
+        Calculate ply heights and positions in laminate z-axis.
+
+        Parameters
+        ----------
+        thkPly : float
+            Thickness of laminate
+        h : list
+            Height of each ply, each value is a float
+        z : list
+            Position of each ply, each value is float
         """
         self.thkLam = sum(self.thkPly)
         self.z = [[]]*self.nPly
@@ -183,7 +208,7 @@ class laminate(object):
 
     def calcABD(self):
         """
-        Calculate ABD matrix of laminate
+        Calculate ABD matrix of laminate.
         """
         Q11 = self.E1/(1-(self.E2*self.nu12**2)/self.E1)
         Q22 = self.E2/self.E1*Q11
@@ -217,20 +242,22 @@ class laminate(object):
 
     def cleanABD(self):
         """
-        Remove numerical errors in the ABD matrix, placing small values to
-        zero
+        Remove numerical errors in the ABD matrix.
+
+        This is carried out by placing small values of the ABD matrix to
+        zero.
         """
         self.ABD[abs(self.ABD) < 1e-3] = 0.0
 
     def calcInverseABD(self):
         """
-        Invert ABD matrix
+        Invert ABD matrix.
         """
         self.ABDInv = np.linalg.inv(self.ABD)
 
     def calcLaminateParameters(self):
         """
-        Calculate laminate properties from ABD matrix
+        Calculate laminate properties from ABD matrix.
         """
         self.ELx = 1/(self.ABDInv[0, 0]*self.thkLam)
         self.ELy = 1/(self.ABDInv[1, 1]*self.thkLam)
@@ -240,49 +267,49 @@ class laminate(object):
 
     def calcStrain(self):
         """
-        Calculate strains in laminate from load
+        Calculate strains in laminate from load.
         """
         loadVec = np.array([[self.Nx, self.Ny, self.Nxy, self.Mx, self.My,
                              self.Mxy]]).T
         self.strainVec = self.ABDInv@loadVec
-        #self.strainLVec = [[]]*self.nPly
-        self.strainLTopVec = [[]]*self.nPly
-        self.strainLBotVec = [[]]*self.nPly
+        #self.strainLamVec = [[]]*self.nPly
+        self.strainLamTopVec = [[]]*self.nPly
+        self.strainLamBotVec = [[]]*self.nPly
         self.strainPlyTopVec = [[]]*self.nPly
         self.strainPlyBotVec = [[]]*self.nPly
         for i in range(self.nPly):
             if self.z[i][0] > 0:
-                self.strainLTopVec[i] = (self.strainVec[:3] +
-                                         self.strainVec[3:]*(self.z[i][0]))
-                self.strainLBotVec[i] = (self.strainVec[:3] +
-                                         self.strainVec[3:]*(self.z[i][1]))
+                self.strainLamTopVec[i] = (self.strainVec[:3] +
+                                           self.strainVec[3:]*(self.z[i][0]))
+                self.strainLamBotVec[i] = (self.strainVec[:3] +
+                                           self.strainVec[3:]*(self.z[i][1]))
             else:
-                self.strainLTopVec[i] = (self.strainVec[:3] +
-                                         self.strainVec[3:]*(self.z[i][1]))
-                self.strainLBotVec[i] = (self.strainVec[:3] +
-                                         self.strainVec[3:]*(self.z[i][0]))
+                self.strainLamTopVec[i] = (self.strainVec[:3] +
+                                           self.strainVec[3:]*(self.z[i][1]))
+                self.strainLamBotVec[i] = (self.strainVec[:3] +
+                                           self.strainVec[3:]*(self.z[i][0]))
             self.strainPlyTopVec[i] = (np.linalg.inv(self.T[i].T) @
-                                       self.strainLTopVec[i])
+                                       self.strainLamTopVec[i])
             self.strainPlyBotVec[i] = (np.linalg.inv(self.T[i].T) @
-                                       self.strainLBotVec[i])
+                                       self.strainLamBotVec[i])
 
     def calcStress(self):
         """
-        Calculate stress components from strains
+        Calculate stress components from strains.
         """
-        self.stressLTopVec = [[]]*self.nPly
-        self.stressLBotVec = [[]]*self.nPly
+        self.stressLamTopVec = [[]]*self.nPly
+        self.stressLamBotVec = [[]]*self.nPly
         self.stressPlyTopVec = [[]]*self.nPly
         self.stressPlyBotVec = [[]]*self.nPly
         for i in range(self.nPly):
-            self.stressLTopVec[i] = self.Qbar[i] @ self.strainLTopVec[i]
-            self.stressLBotVec[i] = self.Qbar[i] @ self.strainLBotVec[i]
-            self.stressPlyTopVec[i] = self.T[i] @ self.stressLTopVec[i]
-            self.stressPlyBotVec[i] = self.T[i] @ self.stressLTopVec[i]
+            self.stressLamTopVec[i] = self.Qbar[i] @ self.strainLamTopVec[i]
+            self.stressLamBotVec[i] = self.Qbar[i] @ self.strainLamBotVec[i]
+            self.stressPlyTopVec[i] = self.T[i] @ self.stressLamTopVec[i]
+            self.stressPlyBotVec[i] = self.T[i] @ self.stressLamTopVec[i]
 
     def calcMisesStress(self):
         """
-        Calculate equivalent stress after von Mises from stress components
+        Calculate equivalent stress after von Mises from stress components.
         """
         A = np.array([[ 1.0, -0.5, 0.0],
                       [-0.5,  1.0, 0.0],
@@ -290,14 +317,14 @@ class laminate(object):
         self.stressMisesTop = np.zeros((self.nPly,))
         self.stressMisesBot = np.zeros((self.nPly,))
         for i in range(self.nPly):
-            self.stressMisesBot[i] = np.sqrt(self.stressLBotVec[i].T @ A @
-                                             self.stressLBotVec[i])
-            self.stressMisesTop[i] = np.sqrt(self.stressLTopVec[i].T @ A @
-                                             self.stressLTopVec[i])
+            self.stressMisesBot[i] = np.sqrt(self.stressLamBotVec[i].T @ A @
+                                             self.stressLamBotVec[i])
+            self.stressMisesTop[i] = np.sqrt(self.stressLamTopVec[i].T @ A @
+                                             self.stressLamTopVec[i])
 
     def calcFailureTsaiWu(self):
         """
-        Calculate Tsai-Wu failure criterion from stress components
+        Calculate Tsai-Wu failure criterion from stress components.
         """
         self.FailureTsaiWu = []
         self.ReserveTsaiWu = []
@@ -348,7 +375,7 @@ class laminate(object):
 
     def calcMass(self):
         """
-        Calculate laminate mass
+        Calculate laminate mass.
         """
         self.LaminateVolume = (np.sum(self.thkPly)/1000)  # fibers volume in m^3 for one m^2 of laminate
         self.LaminateMass = self.LaminateVolume*(self.rhoFiber*self.phi +
@@ -359,7 +386,7 @@ class laminate(object):
                        plotShow=True, fontSize=12, fontName="Tex Gyre Pagella",
                        ColorMap=0):
         """
-        Plot ply stackup of laminate
+        Plot ply stackup of laminate.
         """
         #if fontName == "Palatino":
         #    fontName = "Tex Gyre Pagella"
@@ -426,7 +453,7 @@ class laminate(object):
     def plotPlyStrainStress(self, Show=True, SaveTex=True, SavePng=True,
                             SaveSvg=True, ColorMap=0, Legend=True):
         """
-        Plot stresses and strains of laminate
+        Plot stresses and strains of laminate.
         """
         colorList = defineColorMap(ColorMap)
         angle = np.rad2deg(self.theta)
@@ -466,11 +493,11 @@ class laminate(object):
             xShift.append(1*Shift+2*Shift*ii)
             for i in range(self.nPly):
                 if self.z[i][0] > 0:
-                    x[i] = (np.array([min(self.strainLTopVec[i][ii][0], 0),
-                                      max(self.strainLTopVec[i][ii][0], 0),
-                                      max(self.strainLBotVec[i][ii][0], 0),
-                                      min(self.strainLBotVec[i][ii][0], 0)]) /
-                            np.max(np.max(self.strainLTopVec))+xShift[-1])
+                    x[i] = (np.array([min(self.strainLamTopVec[i][ii][0], 0),
+                                      max(self.strainLamTopVec[i][ii][0], 0),
+                                      max(self.strainLamBotVec[i][ii][0], 0),
+                                      min(self.strainLamBotVec[i][ii][0], 0)]) /
+                            np.max(np.max(self.strainLamTopVec))+xShift[-1])
                     y = np.array([self.z[i][0], self.z[i][0], self.z[i][1],
                                   self.z[i][1]])
                     ax.add_patch(Polygon(xy=list(zip(x[i], y)), fill="r",
@@ -478,11 +505,11 @@ class laminate(object):
                                          color=colorList[int(colorIndex[i])],
                                          zorder=i))
                 else:
-                    x[i] = (np.array([max(self.strainLBotVec[i][ii][0], 0),
-                                      min(self.strainLBotVec[i][ii][0], 0),
-                                      min(self.strainLTopVec[i][ii][0], 0),
-                                      max(self.strainLTopVec[i][ii][0], 0)]) /
-                            np.max(np.max(self.strainLTopVec))+xShift[-1])
+                    x[i] = (np.array([max(self.strainLamBotVec[i][ii][0], 0),
+                                      min(self.strainLamBotVec[i][ii][0], 0),
+                                      min(self.strainLamTopVec[i][ii][0], 0),
+                                      max(self.strainLamTopVec[i][ii][0], 0)]) /
+                            np.max(np.max(self.strainLamTopVec))+xShift[-1])
                     y = np.array([self.z[i][0], self.z[i][0], self.z[i][1],
                                   self.z[i][1]])
                     ax.add_patch(Polygon(xy=list(zip(x[i], y)), fill="r",
@@ -492,11 +519,11 @@ class laminate(object):
             xShift.append(2*Shift+2*Shift*ii)
             for i in range(self.nPly):
                 if self.z[i][0] > 0:
-                    x[i] = (np.array([min(self.stressLTopVec[i][ii][0], 0),
-                                      max(self.stressLTopVec[i][ii][0], 0),
-                                      max(self.stressLBotVec[i][ii][0], 0),
-                                      min(self.stressLBotVec[i][ii][0], 0)]) /
-                            np.max(np.max(self.stressLTopVec))+xShift[-1])
+                    x[i] = (np.array([min(self.stressLamTopVec[i][ii][0], 0),
+                                      max(self.stressLamTopVec[i][ii][0], 0),
+                                      max(self.stressLamBotVec[i][ii][0], 0),
+                                      min(self.stressLamBotVec[i][ii][0], 0)]) /
+                            np.max(np.max(self.stressLamTopVec))+xShift[-1])
                     y = np.array([self.z[i][0], self.z[i][0], self.z[i][1],
                                   self.z[i][1]])
                     ax.add_patch(Polygon(xy=list(zip(x[i], y)), fill="r",
@@ -504,11 +531,11 @@ class laminate(object):
                                          color=colorList[int(colorIndex[i])],
                                          zorder=i))
                 else:
-                    x[i] = (np.array([min(self.stressLBotVec[i][ii][0], 0),
-                                      max(self.stressLBotVec[i][ii][0], 0),
-                                      max(self.stressLTopVec[i][ii][0], 0),
-                                      min(self.stressLTopVec[i][ii][0], 0)]) /
-                            np.max(np.max(self.stressLTopVec))+xShift[-1])
+                    x[i] = (np.array([min(self.stressLamBotVec[i][ii][0], 0),
+                                      max(self.stressLamBotVec[i][ii][0], 0),
+                                      max(self.stressLamTopVec[i][ii][0], 0),
+                                      min(self.stressLamTopVec[i][ii][0], 0)]) /
+                            np.max(np.max(self.stressLamTopVec))+xShift[-1])
                     y = np.array([self.z[i][0], self.z[i][0], self.z[i][1],
                                   self.z[i][1]])
                     ax.add_patch(Polygon(xy=list(zip(x[i], y)), fill="r",
@@ -562,7 +589,7 @@ class laminate(object):
     def plotPlyStrainStressPly(self, Show=True, SaveTex=True, SavePng=True,
                                SaveSvg=True, ColorMap=0, Legend=True):
         """
-        Plot strain and stress in ply
+        Plot strain and stress in ply.
         """
         colorList = defineColorMap(ColorMap)
         angle = np.rad2deg(self.theta)
@@ -605,7 +632,7 @@ class laminate(object):
                     x[i] = (np.array([min(self.strainPlyTopVec[i][ii][0], 0),
                                       max(self.strainPlyTopVec[i][ii][0], 0),
                                       max(self.strainPlyBotVec[i][ii][0], 0),
-                                      min(self.strainPlyBotVec[i][ii][0], 0)])/
+                                      min(self.strainPlyBotVec[i][ii][0], 0)]) /
                             np.max(np.max(self.strainPlyTopVec))+xShift[-1])
                     y = np.array([self.z[i][0], self.z[i][0], self.z[i][1],
                                   self.z[i][1]])
@@ -617,7 +644,7 @@ class laminate(object):
                     x[i] = (np.array([max(self.strainPlyBotVec[i][ii][0], 0),
                                       min(self.strainPlyBotVec[i][ii][0], 0),
                                       min(self.strainPlyTopVec[i][ii][0], 0),
-                                      max(self.strainPlyTopVec[i][ii][0], 0)])/
+                                      max(self.strainPlyTopVec[i][ii][0], 0)]) /
                             np.max(np.max(self.strainPlyTopVec))+xShift[-1])
                     y = np.array([self.z[i][0], self.z[i][0], self.z[i][1],
                                   self.z[i][1]])
@@ -631,7 +658,7 @@ class laminate(object):
                     x[i] = (np.array([min(self.stressPlyTopVec[i][ii][0], 0),
                                       max(self.stressPlyTopVec[i][ii][0], 0),
                                       max(self.stressPlyBotVec[i][ii][0], 0),
-                                      min(self.stressPlyBotVec[i][ii][0], 0)])/
+                                      min(self.stressPlyBotVec[i][ii][0], 0)]) /
                             np.max(np.max(self.stressPlyTopVec))+xShift[-1])
                     y = np.array([self.z[i][0], self.z[i][0], self.z[i][1],
                                   self.z[i][1]])
@@ -643,7 +670,7 @@ class laminate(object):
                     x[i] = (np.array([min(self.stressPlyBotVec[i][ii][0], 0),
                                       max(self.stressPlyBotVec[i][ii][0], 0),
                                       max(self.stressPlyTopVec[i][ii][0], 0),
-                                      min(self.stressPlyTopVec[i][ii][0], 0)])/
+                                      min(self.stressPlyTopVec[i][ii][0], 0)]) /
                             np.max(np.max(self.stressPlyTopVec))+xShift[-1])
                     y = np.array([self.z[i][0], self.z[i][0], self.z[i][1],
                                   self.z[i][1]])
@@ -701,17 +728,17 @@ class laminate(object):
                       LaminateCS=True, PlyCS=True,
                       PlyTop=True, PlyBottom=True):
         """
-        Write table of ply values
+        Write table of ply values.
         """
         FileName = "PlyTable"
         TestDataTop = {"ply": np.arange(1, self.nPly+1),
                        "fiber orientation": np.rad2deg(self.theta),
-                       "strain x": [i[0][0] for i in self.strainLTopVec],
-                       "stress x": [i[0][0] for i in self.stressLTopVec],
-                       "strain y": [i[1][0] for i in self.strainLTopVec],
-                       "stress y": [i[1][0] for i in self.stressLTopVec],
-                       "strain xy": [i[2][0] for i in self.strainLTopVec],
-                       "stress xy": [i[2][0] for i in self.stressLTopVec],
+                       "strain x": [i[0][0] for i in self.strainLamTopVec],
+                       "stress x": [i[0][0] for i in self.stressLamTopVec],
+                       "strain y": [i[1][0] for i in self.strainLamTopVec],
+                       "stress y": [i[1][0] for i in self.stressLamTopVec],
+                       "strain xy": [i[2][0] for i in self.strainLamTopVec],
+                       "stress xy": [i[2][0] for i in self.stressLamTopVec],
                        "strain 1": [i[0][0] for i in self.strainPlyTopVec],
                        "stress 1": [i[0][0] for i in self.stressPlyTopVec],
                        "strain 2": [i[1][0] for i in self.strainPlyTopVec],
@@ -722,12 +749,12 @@ class laminate(object):
                        "Tsai-Wu reserve": self.ReserveTsaiWu}
         TestDataBot = {"ply": np.arange(1, self.nPly+1),
                        "fiber orientation": np.rad2deg(self.theta),
-                       "strain x": [i[0][0] for i in self.strainLBotVec],
-                       "stress x": [i[0][0] for i in self.stressLBotVec],
-                       "strain y": [i[1][0] for i in self.strainLBotVec],
-                       "stress y": [i[1][0] for i in self.stressLBotVec],
-                       "strain xy": [i[2][0] for i in self.strainLBotVec],
-                       "stress xy": [i[2][0] for i in self.stressLBotVec],
+                       "strain x": [i[0][0] for i in self.strainLamBotVec],
+                       "stress x": [i[0][0] for i in self.stressLamBotVec],
+                       "strain y": [i[1][0] for i in self.strainLamBotVec],
+                       "stress y": [i[1][0] for i in self.stressLamBotVec],
+                       "strain xy": [i[2][0] for i in self.strainLamBotVec],
+                       "stress xy": [i[2][0] for i in self.stressLamBotVec],
                        "strain 1": [i[0][0] for i in self.strainPlyBotVec],
                        "stress 1": [i[0][0] for i in self.stressPlyBotVec],
                        "strain 2": [i[1][0] for i in self.strainPlyBotVec],
@@ -773,7 +800,7 @@ class laminate(object):
                                                       index=None, header=True)
                     if printData:
                         print(self.LaminateName,
-                              'Laminate top reference system characteristics')
+                              'laminate properties in top reference system:')
                         print(LaminateDataFrameTop.to_string(index=False))
 
                 if PlyBottom:
@@ -788,7 +815,7 @@ class laminate(object):
                                                       index=None, header=True)
                     if printData:
                         print(self.LaminateName,
-                              'Laminate bottom reference system characteristics')
+                              'laminate properties in bottom reference system:')
                         print(LaminateDataFrameBot.to_string(index=False))
             if PlyCS:
                 headerTex = ["ply", "fiber orientation $\\theta$ [deg]",
@@ -809,7 +836,7 @@ class laminate(object):
                                                  index=None, header=True)
                     if printData:
                         print(self.LaminateName,
-                              'Ply top reference system characteristics')
+                              'ply properties in top reference system:')
                         print(PlyDataFrameTop.to_string(index=False))
                 if PlyBottom:
                     PlyDataFrameBot.to_latex(FileName+"PlyBot.tex", index=None,
@@ -820,29 +847,85 @@ class laminate(object):
                                                  index=None, header=True)
                     if printData:
                         print(self.LaminateName,
-                              'Ply bottom reference system characteristics')
+                              'ply properties in bottom reference system:')
                         print(PlyDataFrameBot.to_string(index=False))
 
 
 def formatNumber(value):
     """
-    Format numbers so that floats with no decimals are integers
+    Format numbers so that floats with no decimals are integers.
     """
     if value % 1 == 0:
         value = int(value)
     return(value)
 
 
-def plotParameterStudyAngle(angles, TW_Res, VMS, Ep, strain, Show=True,
+def plotParameterStudyAngle(angles, RTW, sigmaM, epsilon1, epsilonx, Show=True,
                             SaveTex=True, SavePng=True, SaveSvg=True, Name="",
                             buffer=0.1, Grid=False, plotSize=(7, 5),
                             ColorTW="r", SymbolTW=".", LineTW="-",
-                            ColorVM="b", SymbolVM=".", LineVM="-",
+                            ColorM="b", SymbolM=".", LineM="-",
                             ColorStrainFiber="g", SymbolStrainFiber=".",
                             LineStrainFiber="-", ColorStrainx="g",
                             SymbolStrainx=".", LineStrainx="-", xBuffer=0):
     """
-    Plot parameter study of ply angles
+    Plot parameter study of ply angles.
+
+    Parameters
+    ----------
+    angles : list or NumPy array
+        Angle values of parameter study
+    RTW : list or NumPy array
+        Tsai-Wu reserve factor of parameter study
+    sigmaM : list or NumPy array
+        Mises stress of parameter study
+    epsilon1 : list or NumPy array
+        ply strain in fiber direction
+    epsilonx : list or NumPy array
+        ply strain in laminate direction x
+    Show : bool
+        Show figures, if off only files will be generated
+    SaveTex : bool
+        Save figure in TeX format using tikz
+    SavePng : bool
+        Save figure in PNG format raster graphics
+    SaveSvg : bool
+        Save figure in SVG format vector graphics
+    Name : str
+        Name of study to be added to file names
+    buffer : float
+        Add space to plots for formatting in percent of difference between
+        maximum and minimum values
+    Gird : bool
+        Add grid to plot
+    plotSize : tuple of two floats
+        Define size of plots, especially important for PNGs
+    ColorTW : str
+        Color for Tsai-Wu plot
+    SymbolTW : str
+        Symbol for Tsai-Wu plot
+    LineTW : str
+        Line type for Tsai-Wu plot
+    ColorM : str
+        Color for Mises stress plot
+    SymbolM : str
+        Symbol for Mises stress plot
+    LineM : str
+        Line type for Mises stress plot
+    ColorStrain1 : str
+        Color for fiber strain plot
+    SymbolStrain1 : str
+        Symbol for fiber strain plot
+    LineStrain1 : str
+        Line type for fiber strain plot
+    ColorStrainX : str
+        Color for laminate strain plot
+    SymbolStrainX : str
+        Symbol for laminate strain plot
+    LineStrainX : str
+        Line type for laminate strain plot
+    xBuffer : float
+        Add space to x-axis in plots
     """
     fig, ax1 = plt.subplots(nrows=1, ncols=1, figsize=plotSize)
     plt.grid(Grid)
@@ -850,12 +933,12 @@ def plotParameterStudyAngle(angles, TW_Res, VMS, Ep, strain, Show=True,
     ax1.spines['top'].set_visible(False)
     ax1.yaxis.set_ticks_position('left')
     ax1.xaxis.set_ticks_position('bottom')
-    plt.plot(angles, TW_Res, ColorTW+SymbolTW+LineTW)
+    plt.plot(angles, RTW, ColorTW+SymbolTW+LineTW)
     plt.ylabel('Tsai-Wu reserve factor $R_{TW}$ [-]')
     plt.xlim([min(angles)-xBuffer, max(angles)+xBuffer])
-    plt.ylim([min(TW_Res)-max(np.abs(TW_Res))*buffer,
-              max(TW_Res)+max(np.abs(TW_Res))*buffer])
-    yticks = np.arange(0, max(TW_Res)+10, step=10)
+    plt.ylim([min(RTW)-max(np.abs(RTW))*buffer,
+              max(RTW)+max(np.abs(RTW))*buffer])
+    yticks = np.arange(0, max(RTW)+10, step=10)
     yticks[0] = 1
     plt.yticks(yticks)
     xticks = np.arange(min(angles), max(angles)+1, step=15)
@@ -878,11 +961,11 @@ def plotParameterStudyAngle(angles, TW_Res, VMS, Ep, strain, Show=True,
     ax2.spines['top'].set_visible(False)
     ax2.yaxis.set_ticks_position('left')
     ax2.xaxis.set_ticks_position('bottom')
-    plt.plot(angles, VMS, ColorVM+SymbolVM+LineVM)
+    plt.plot(angles, sigmaM, ColorM+SymbolM+LineM)
     plt.ylabel('equivalent stress after Mises $\\sigma_M$ [MPa] ')
     plt.xlim([min(angles)-xBuffer, max(angles)+xBuffer])
-    plt.ylim([min(VMS)-max(np.abs(VMS))*buffer,
-              max(VMS)+max(np.abs(VMS))*buffer])
+    plt.ylim([min(sigmaM)-max(np.abs(sigmaM))*buffer,
+              max(sigmaM)+max(np.abs(sigmaM))*buffer])
     xticks = np.arange(min(angles), max(angles)+1, step=15)
     plt.xticks(xticks)
     plt.xlabel("fiber orientation angle $\\theta$ [deg]")
@@ -904,11 +987,11 @@ def plotParameterStudyAngle(angles, TW_Res, VMS, Ep, strain, Show=True,
     ax3.spines['top'].set_visible(False)
     ax3.yaxis.set_ticks_position('left')
     ax3.xaxis.set_ticks_position('bottom')
-    plt.plot(angles, Ep, ColorStrainx+SymbolStrainx+LineStrainx)
-    plt.ylabel('strain in $x$ $\\varepsilon_x$ [-]')
+    plt.plot(angles, epsilon1, ColorStrainx+SymbolStrainx+LineStrainx)
+    plt.ylabel('epsilonx in $x$ $\\varepsilon_x$ [-]')
     plt.xlim([min(angles)-xBuffer, max(angles)+xBuffer])
-    plt.ylim([min(Ep)-max(np.abs(Ep))*buffer,
-              max(Ep)+max(np.abs(Ep))*buffer])
+    plt.ylim([min(epsilon1)-max(np.abs(epsilon1))*buffer,
+              max(epsilon1)+max(np.abs(epsilon1))*buffer])
     xticks = np.arange(min(angles), max(angles)+1, step=15)
     plt.xticks(xticks)
     plt.xlabel("fiber orientation angle $\\theta$ [deg]")
@@ -930,12 +1013,12 @@ def plotParameterStudyAngle(angles, TW_Res, VMS, Ep, strain, Show=True,
     ax4.spines['top'].set_visible(False)
     ax4.yaxis.set_ticks_position('left')
     ax4.xaxis.set_ticks_position('bottom')
-    plt.plot(angles, strain,
+    plt.plot(angles, epsilonx,
              ColorStrainFiber+SymbolStrainFiber+LineStrainFiber)
     plt.ylabel('strain in $\\parallel$ $\\varepsilon_{\\parallel}$ [-]')
     plt.xlim([min(angles)-xBuffer, max(angles)+xBuffer])
-    plt.ylim([min(strain)-max(np.abs(strain))*buffer,
-              max(strain)+max(np.abs(strain))*buffer])
+    plt.ylim([min(epsilonx)-max(np.abs(epsilonx))*buffer,
+              max(epsilonx)+max(np.abs(epsilonx))*buffer])
     xticks = np.arange(min(angles), max(angles)+1, step=15)
     plt.xticks(xticks)
     plt.xlabel("fiber orientation angle $\\theta$ [deg]")
@@ -954,6 +1037,20 @@ def plotParameterStudyAngle(angles, TW_Res, VMS, Ep, strain, Show=True,
 
 
 def defineColorMap(ColorMap=0):
+    """
+    Define color map.
+
+    Parameters
+    ----------
+    ColorMap : TYPE, optional
+        DESCRIPTION. The default is 0.
+
+    Returns
+    -------
+    colorList : NumPy array
+        List of colors
+
+    """
     if isinstance(ColorMap, int):
         mapName = ["tab10", "Accent", "Set1_r", "Pastel1", "Set2", "Dark2",
                    "Set3", "jet"]
@@ -1007,12 +1104,12 @@ if __name__ == "__main__":
     Laminate1.plotPlyStrainStress()
     Laminate1.plotPlyStrainStressPly()
     angles = np.rad2deg(Laminate1.theta)
-    TW_Res = Laminate1.ReserveTsaiWu
-    VMS = Laminate1.stressMisesTop
-    Ep = np.zeros(Laminate1.nPly)
-    strain = np.zeros(Laminate1.nPly)
+    RTW = Laminate1.ReserveTsaiWu
+    sigmaM = Laminate1.stressMisesTop
+    Ex = np.zeros(Laminate1.nPly)
+    E1 = np.zeros(Laminate1.nPly)
     for ii in range(Laminate1.nPly):
-        Ep[ii] = np.array([Laminate1.strainLTopVec[ii][0]])
-        strain[ii] = np.array([Laminate1.strainPlyTopVec[ii][0]])
+        Ex[ii] = np.array([Laminate1.strainLamTopVec[ii][0]])
+        E1[ii] = np.array([Laminate1.strainPlyTopVec[ii][0]])
     Laminate1.writeTablePly(LaminateCS=True, PlyCS=True,
                             PlyTop=True, PlyBottom=True)
