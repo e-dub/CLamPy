@@ -12,7 +12,7 @@ if __name__ == '__main__':
     from distutils.core import setup
     extra_files = package_files('CLamPy')
     setup(name='CLamPy',
-          version='1.0',
+          version='1.1',
           description='Classical LAMinate theory for the lightweight design of structures and systems in PYthon',
           author='E. M. Gioia & E. J. Wehrle',
           package_data={'': extra_files},
