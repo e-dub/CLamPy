@@ -390,7 +390,8 @@ class laminate(object):
         """
         #if fontName == "Palatino":
         #    fontName = "Tex Gyre Pagella"
-        colorList = defineColorMap(ColorMap)
+        colorList = defineColorMap(ColorMap,
+                                   self.nPly - int(self.symmetric*self.nPly/2))
         fig = plt.figure(figsize=(2+int(self.nPly-1)/2, 2+int(self.nPly-1)/2))
         ax = fig.add_subplot()
 
@@ -421,6 +422,7 @@ class laminate(object):
                 break
             colorIndex[(np.abs(np.abs(angle)-np.abs(angle[i])) <= 0.001).tolist()] = i
             index[(np.abs(np.abs(angle)-np.abs(angle[i])) <= 0.001).tolist()] = -1
+        colorIndex -= min(colorIndex)
         for ii in range(self.nPly):
             el = ii*0.25
             plot_hatches(ax, angle[ii], ii, el, offset=0.05)
@@ -455,7 +457,8 @@ class laminate(object):
         """
         Plot stresses and strains of laminate.
         """
-        colorList = defineColorMap(ColorMap)
+        colorList = defineColorMap(ColorMap,
+                                   self.nPly - int(self.symmetric*self.nPly/2))
         angle = np.rad2deg(self.theta)
         index = np.linspace(0, self.nPly-1, self.nPly)
         colorIndex = np.ones((self.nPly))
@@ -464,6 +467,7 @@ class laminate(object):
                 break
             colorIndex[(np.abs(np.abs(angle)-np.abs(angle[i])) <= 0.001).tolist()] = i
             index[(np.abs(np.abs(angle)-np.abs(angle[i])) <= 0.001).tolist()] = -1
+        colorIndex -= min(colorIndex)
         legendElements = []
         angleList = []
         angleOrder = np.argsort(angle)
@@ -591,7 +595,8 @@ class laminate(object):
         """
         Plot strain and stress in ply.
         """
-        colorList = defineColorMap(ColorMap)
+        colorList = defineColorMap(ColorMap,
+                                   self.nPly - int(self.symmetric*self.nPly/2))
         angle = np.rad2deg(self.theta)
         index = np.linspace(0, self.nPly-1, self.nPly)
         colorIndex = np.ones((self.nPly))
@@ -600,6 +605,7 @@ class laminate(object):
                 break
             colorIndex[(np.abs(np.abs(angle)-np.abs(angle[i])) <= 0.001).tolist()] = i
             index[(np.abs(np.abs(angle)-np.abs(angle[i])) <= 0.001).tolist()] = -1
+        colorIndex -= min(colorIndex)
         legendElements = []
         angleList = []
         angleOrder = np.argsort(angle)
@@ -1036,7 +1042,7 @@ def plotParameterStudyAngle(angles, RTW, sigmaM, epsilon1, epsilonx, Show=True,
         plt.show()
 
 
-def defineColorMap(ColorMap=0):
+def defineColorMap(ColorMap=0, nColors=3):
     """
     Define color map.
 
@@ -1051,12 +1057,17 @@ def defineColorMap(ColorMap=0):
         List of colors
 
     """
+    mapName = ["tab10", "Accent", "Set1_r", "Pastel1", "Set2", "Dark2",
+               "Set3", "jet", "tab20"]
+    nColorMap = [10, 8, 9, 9, 8, 8, 12, 7, 20]
     if isinstance(ColorMap, int):
-        mapName = ["tab10", "Accent", "Set1_r", "Pastel1", "Set2", "Dark2",
-                   "Set3", "jet"]
-        nColors = [10, 8, 9, 9, 8, 8, 12, 7]
-        cmap = cm.get_cmap(mapName[ColorMap])
-        colorList = cmap(np.linspace(0, 1, nColors[ColorMap]))
+        if nColors > 10:
+            cmap = cm.get_cmap("tab20")
+            colorList = cmap(np.linspace(0, 1, nColorMap[-1]))
+            colorList = np.concatenate((colorList[::2], colorList[1::2]), 0)
+        else:
+            cmap = cm.get_cmap(mapName[ColorMap])
+            colorList = cmap(np.linspace(0, 1, nColorMap[ColorMap]))
     elif ColorMap == "unibz":
         colorList = [(0/255, 123/255, 228/255),  (249/255, 107/255, 7/255),
                      (26/255, 140/255, 100/255),  (237/255, 51/255, 26/255),
@@ -1113,3 +1124,50 @@ if __name__ == "__main__":
         E1[ii] = np.array([Laminate1.strainPlyTopVec[ii][0]])
     Laminate1.writeTablePly(LaminateCS=True, PlyCS=True,
                             PlyTop=True, PlyBottom=True)
+
+
+
+    # Initialize lamiante 2 and set parameters
+    Laminate2 = laminate()
+    Laminate2.LaminateName = "test1_Laminate2"
+    Laminate2.nPly = 11
+    Laminate2.theta = [-45, 45, 90, 60, 30, 0, 30, 60, 90, 45, -45,]
+    Laminate2.thkPly = [1]*11
+    Laminate2.E1 = 46000
+    Laminate2.E2 = 10000
+    Laminate2.G12 = 4600
+    Laminate2.nu12 = 0.31
+    Laminate2.phi = 0.5
+    Laminate2.symmetric = True
+    Laminate2.Nx = 100
+    Laminate2.Ny = 0
+    Laminate2.Nxy = 0
+    Laminate2.Mx = 0
+    Laminate2.My = 0
+    Laminate2.Mxy = 0
+    Laminate2.T1 = 1950
+    Laminate2.T2 = 48
+    Laminate2.C1 = 1480
+    Laminate2.C2 = 200
+    Laminate2.S12 = 55
+    Laminate2.S13 = 55
+    Laminate2.S23 = 55
+    Laminate2.SymmetricLaminate()
+    Laminate2.deg2rad()
+    Laminate2.calcPlyPositions()
+    Laminate2.calcABD()
+    Laminate2.cleanABD()
+    Laminate2.calcInverseABD()
+    Laminate2.calcLaminateParameters()
+    Laminate2.calcStrain()
+    Laminate2.calcStress()
+    Laminate2.calcMisesStress()
+    Laminate2.calcFailureTsaiWu()
+
+    # Plot diagrams and print response tables for laminate 2
+    Laminate2.plotStackLayup()
+    Laminate2.plotPlyStrainStress()
+    Laminate2.writeTablePly(LaminateCS=True, PlyCS=False, PlyTop=True,
+                            PlyBottom=True)
+
+#
