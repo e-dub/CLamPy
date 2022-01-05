@@ -29,7 +29,7 @@ pip install openpyxl
 
 ### Install
 ```
-python setup.py install
+python -m pip install -U .
 ```
 
 ### PIP
