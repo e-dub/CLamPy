@@ -3,7 +3,7 @@
 [![PyPi Version](https://img.shields.io/pypi/v/CLamPy.svg?style=flat-square)](https://pypi.org/project/CLamPy)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/CLamPy.svg?style=flat-square)](https://pypi.org/project/CLamPy/)
 [![GitHub stars](https://img.shields.io/github/stars/e-dub/CLamPy.svg?style=flat-square&logo=github&label=Stars&logoColor=white)](https://github.com/e-dub/CLamPy)
-[![PyPi downloads](https://img.shields.io/pypi/dm/CLamPy.svg?style=flat-square)](https://pypistats.org/packages/CLamPy
+[![PyPi downloads](https://img.shields.io/pypi/dm/CLamPy.svg?style=flat-square)](https://pypistats.org/packages/CLamPy)
 [![Code style: blue](https://img.shields.io/badge/code%20style-blue-blue.svg)](https://blue.readthedocs.io/)
 
 # CLamPy 
