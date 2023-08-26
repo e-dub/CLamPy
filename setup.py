@@ -21,7 +21,7 @@ if __name__ == '__main__':
     extra_files = package_files('CLamPy')
     setup(
         name='CLamPy',
-        version='1.1',
+        version='1.2',
         description='Classical LAMinate theory for the lightweight design of structures and systems in PYthon',
         author='E. M. Gioia & E. J. Wehrle',
         package_data={'': extra_files},
